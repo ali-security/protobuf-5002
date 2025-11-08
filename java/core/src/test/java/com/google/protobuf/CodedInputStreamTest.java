@@ -81,12 +81,14 @@ public class CodedInputStreamTest {
           blockSize = DEFAULT_BLOCK_SIZE;
         }
         ArrayList<ByteBuffer> input = new ArrayList<ByteBuffer>();
+        input.add(ByteBuffer.allocateDirect(0));
         for (int i = 0; i < data.length; i += blockSize) {
           int rl = Math.min(blockSize, data.length - i);
           ByteBuffer rb = ByteBuffer.allocateDirect(rl);
           rb.put(data, i, rl);
           rb.flip();
           input.add(rb);
+          input.add(ByteBuffer.allocateDirect(0));
         }
         return CodedInputStream.newInstance(input);
       }
@@ -98,12 +100,14 @@ public class CodedInputStreamTest {
           blockSize = DEFAULT_BLOCK_SIZE;
         }
         ArrayList<ByteBuffer> input = new ArrayList<ByteBuffer>();
+        input.add(ByteBuffer.allocateDirect(0));
         for (int i = 0; i < data.length; i += blockSize) {
           int rl = Math.min(blockSize, data.length - i);
           ByteBuffer rb = ByteBuffer.allocateDirect(rl);
           rb.put(data, i, rl);
           rb.flip();
           input.add(rb);
+          input.add(ByteBuffer.allocateDirect(0));
         }
         return CodedInputStream.newInstance(new IterableByteBufferInputStream(input));
       }
@@ -1661,5 +1665,23 @@ public class CodedInputStreamTest {
     } catch (InvalidProtocolBufferException ex) {
       // Expected.
     }
+  }
+
+  @Test
+  public void testCodedInputStreamWithEmptyBuffers_isAtEnd() throws Exception {
+    ArrayList<ByteBuffer> inputList = new ArrayList<>();
+    inputList.add(ByteBuffer.wrap(new byte[0]));
+    CodedInputStream cis = CodedInputStream.newInstance(inputList);
+    assertThat(cis.isAtEnd()).isTrue();
+  }
+
+  @Test
+  public void testCodedInputStreamWithEmptyBuffers_isAtEndAfterRead() throws Exception {
+    ArrayList<ByteBuffer> inputList = new ArrayList<>();
+    inputList.add(ByteBuffer.wrap(new byte[4096]));
+    inputList.add(ByteBuffer.wrap(new byte[0]));
+    CodedInputStream cis = CodedInputStream.newInstance(inputList);
+    cis.readRawBytes(4096);
+    assertThat(cis.isAtEnd()).isTrue();
   }
 }
