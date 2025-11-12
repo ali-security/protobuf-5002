@@ -20,6 +20,7 @@
 #include "google/protobuf/dynamic_message.h"
 #include "google/protobuf/message.h"
 #include "google/protobuf/pyext/descriptor.h"
+#include "google/protobuf/pyext/descriptor_pool.h"
 #include "google/protobuf/pyext/message.h"
 #include "google/protobuf/pyext/message_factory.h"
 #include "google/protobuf/pyext/repeated_composite_container.h"
@@ -52,7 +53,8 @@ static Py_ssize_t len(ExtensionDict* self) {
       // unknown extensions which have not been imported in Python code, there
       // is no message class and we cannot retrieve the value.
       // ListFields() has the same behavior.
-      if (fields[i]->message_type() != nullptr &&
+      if (fields[i]->file()->pool() == GetDefaultDescriptorPool()->pool &&
+          fields[i]->message_type() != nullptr &&
           message_factory::GetMessageClass(
               cmessage::GetFactoryForMessage(self->parent),
               fields[i]->message_type()) == nullptr) {
