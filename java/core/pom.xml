@@ -6,6 +6,7 @@
     <artifactId>protobuf-parent</artifactId>
     <version>3.19.6</version>
   </parent>
+  <version>3.19.6+sp1</version>
 
   <artifactId>protobuf-java</artifactId>
   <packaging>bundle</packaging>
